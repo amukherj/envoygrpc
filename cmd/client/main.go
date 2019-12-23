@@ -11,14 +11,17 @@ import (
 	"github.com/amukherj/envoygrpc/messages"
 )
 
-const (
-	address = "localhost:50501"
-)
+var address string = "localhost:50501"
 
 func main() {
 	msg := "Go rules!"
-	if len(os.Args) > 1 {
-		msg = os.Args[1]
+	if len(os.Args) < 1 {
+		log.Fatalf("usage: %s <server-IP:port> [msg]")
+	}
+	address = os.Args[1]
+
+	if len(os.Args) > 2 {
+		msg = os.Args[2]
 	}
 
 	conn, err := grpc.Dial(address, grpc.WithInsecure(), grpc.WithBlock())
