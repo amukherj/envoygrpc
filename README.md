@@ -36,8 +36,13 @@ to the local host's hostname.
 Start two instances of the gRPC server on a remote server. Note the IP
 address of the remote server.
 
-Edit the file config/envoy/envoy.yaml in the repo, and replace the IP address
-`192.168.87.3` with the IP of your remote server. Now start Envoy locally:
+On the remote site, start an Envoy instance by running:
+
+    ./bin/envoy -c config/envoy/envoy-emery.yaml
+
+On the local server, edit config/envoy/envoy.yaml in the repo and replace
+the IP address `192.168.87.3` with the IP of your remote server. Now start
+Envoy locally:
 
     ./bin/envoy -c config/envoy/envoy.yaml
 
