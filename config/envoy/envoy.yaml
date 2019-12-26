@@ -3,7 +3,7 @@ static_resources:
   - address:
       socket_address:
         address: 0.0.0.0
-        port_value: 9911 # expose proxy on port 9211
+        port_value: 9911
     filter_chains:
     - filters:
       - name: envoy.http_connection_manager
@@ -22,6 +22,7 @@ static_resources:
               - "*"
               routes:
               - match:
+                  prefix: "/"
                   headers:
                   - name: x-remote-hosts
                     exact_match: emery
@@ -59,8 +60,8 @@ static_resources:
     http2_protocol_options: {} # enable H2 protocol
     hosts:
     - socket_address:
-        address: 192.168.87.4
+        address: 192.168.87.3
         port_value: 50501
     - socket_address:
-        address: 192.168.87.4
+        address: 192.168.87.3
         port_value: 50503

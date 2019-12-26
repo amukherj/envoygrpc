@@ -16,8 +16,9 @@ var address string = "localhost:50501"
 
 func main() {
 	msg := "Go rules!"
-	if len(os.Args) < 1 {
-		log.Fatalf("usage: %s <server-IP:port> [[msg] header value]")
+	if len(os.Args) <= 1 {
+		log.Fatalf("usage: %s <server-IP:port> [[msg] header value]",
+			os.Args[0])
 	}
 	address = os.Args[1]
 
