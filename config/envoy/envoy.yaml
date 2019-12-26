@@ -15,33 +15,31 @@ static_resources:
             config:
               path: /dev/stdout
           route_config:
-            name: greeter_route # configure the greeter service routes
+            name: greeter_route # configure the localclus routes
             virtual_hosts:
-            - name: service
+            - name: vhemery
+              domains:
+              - "emery"
+              routes:
+              - match:
+                  prefix: "/"
+                  grpc: {}
+                route:
+                  cluster: emery
+            - name: servicelocal
               domains:
               - "*"
               routes:
               - match:
                   prefix: "/"
-                  headers:
-                  - name: x-remote-hosts
-                    exact_match: emery
                   grpc: {}
                 route:
-                  cluster: emery
-              - match:
-                  prefix: "/"
-                  grpc: {}
-                route:
-                  cluster: greeter_service
-              rate_limits: # enable rate limit checks for the greeter service
-                actions:
-                - destination_cluster: {}
+                  cluster: localclus
           http_filters:
           - name: envoy.router # enable the Router filter
             config: {}
   clusters:
-  - name: greeter_service # register the Greeter server
+  - name: localclus
     connect_timeout: 1s
     type: strict_dns
     lb_policy: round_robin
@@ -53,7 +51,7 @@ static_resources:
     - socket_address:
         address: localhost
         port_value: 50503
-  - name: emery # register the Greeter server
+  - name: emery
     connect_timeout: 1s
     type: static
     lb_policy: round_robin
