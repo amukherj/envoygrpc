@@ -32,7 +32,12 @@ func main() {
 		headerVal = os.Args[4]
 	}
 
-	conn, err := grpc.Dial(address, grpc.WithInsecure(), grpc.WithBlock())
+	dialOptions := []grpc.DialOption{grpc.WithInsecure(), grpc.WithBlock()}
+	if header == "authority" {
+		dialOptions = append(dialOptions, grpc.WithAuthority(headerVal))
+		header = ""
+	}
+	conn, err := grpc.Dial(address, dialOptions...)
 	if err != nil {
 		log.Fatalf("Failed to connect to grpc server: %v", err)
 	}
