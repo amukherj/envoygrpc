@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/metadata"
 
 	"github.com/amukherj/envoygrpc/messages"
 )
@@ -16,12 +17,18 @@ var address string = "localhost:50501"
 func main() {
 	msg := "Go rules!"
 	if len(os.Args) < 1 {
-		log.Fatalf("usage: %s <server-IP:port> [msg]")
+		log.Fatalf("usage: %s <server-IP:port> [[msg] header value]")
 	}
 	address = os.Args[1]
 
 	if len(os.Args) > 2 {
 		msg = os.Args[2]
+	}
+
+	var header, headerVal string
+	if len(os.Args) > 4 {
+		header = os.Args[3]
+		headerVal = os.Args[4]
 	}
 
 	conn, err := grpc.Dial(address, grpc.WithInsecure(), grpc.WithBlock())
@@ -41,7 +48,13 @@ func main() {
 		UtcTime:    &now,
 		Msg:        &msg,
 	}
-	resp, err := client.Hello(ctx, &payload)
+
+	headers := metadata.MD{}
+	if len(header) > 0 {
+		headers[header] = []string{headerVal}
+	}
+
+	resp, err := client.Hello(ctx, &payload, grpc.Header(&headers))
 	if err != nil {
 		log.Fatalf("RPC error: %v", err)
 	}

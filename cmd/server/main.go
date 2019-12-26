@@ -35,6 +35,11 @@ func (m MsgService) Hello(ctx context.Context,
 
 func main() {
 	port := ":50501"
+	if len(os.Args) > 1 {
+		port = os.Args[1]
+		log.Println("len(os.Args) > 1: ", port)
+	}
+
 	lis, err := net.Listen("tcp", port)
 	if err != nil {
 		log.Fatalf("Failed to start listening on %s: %v", port, err)
