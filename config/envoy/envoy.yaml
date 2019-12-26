@@ -1,0 +1,66 @@
+static_resources:
+  listeners:
+  - address:
+      socket_address:
+        address: 0.0.0.0
+        port_value: 9911 # expose proxy on port 9211
+    filter_chains:
+    - filters:
+      - name: envoy.http_connection_manager
+        config:
+          codec_type: auto
+          stat_prefix: ingress_http
+          access_log: # configure logging
+            name: envoy.file_access_log
+            config:
+              path: /dev/stdout
+          route_config:
+            name: greeter_route # configure the greeter service routes
+            virtual_hosts:
+            - name: service
+              domains:
+              - "*"
+              routes:
+              - match:
+                  headers:
+                  - name: x-remote-hosts
+                    exact_match: emery
+                  grpc: {}
+                route:
+                  cluster: emery
+              - match:
+                  prefix: "/"
+                  grpc: {}
+                route:
+                  cluster: greeter_service
+              rate_limits: # enable rate limit checks for the greeter service
+                actions:
+                - destination_cluster: {}
+          http_filters:
+          - name: envoy.router # enable the Router filter
+            config: {}
+  clusters:
+  - name: greeter_service # register the Greeter server
+    connect_timeout: 1s
+    type: strict_dns
+    lb_policy: round_robin
+    http2_protocol_options: {} # enable H2 protocol
+    hosts:
+    - socket_address:
+        address: localhost
+        port_value: 50501
+    - socket_address:
+        address: localhost
+        port_value: 50503
+  - name: emery # register the Greeter server
+    connect_timeout: 1s
+    type: static
+    lb_policy: round_robin
+    http2_protocol_options: {} # enable H2 protocol
+    hosts:
+    - socket_address:
+        address: 192.168.87.4
+        port_value: 50501
+    - socket_address:
+        address: 192.168.87.4
+        port_value: 50503
