@@ -17,15 +17,6 @@ static_resources:
           route_config:
             name: greeter_route # configure the localclus routes
             virtual_hosts:
-            - name: vhemery
-              domains:
-              - "emery"
-              routes:
-              - match:
-                  prefix: "/"
-                  grpc: {}
-                route:
-                  cluster: emery
             - name: servicelocal
               domains:
               - "*"
@@ -38,6 +29,35 @@ static_resources:
           http_filters:
           - name: envoy.router # enable the Router filter
             config: {}
+  - address:
+      socket_address:
+        address: 127.0.0.1
+        port_value: 9912
+    filter_chains:
+    - filters:
+      - name: envoy.http_connection_manager
+        config:
+          codec_type: auto
+          stat_prefix: ingress_http
+          access_log: # configure logging
+            name: envoy.file_access_log
+            config:
+              path: /dev/stdout
+          route_config:
+            name: greeter_route # configure the localclus routes
+            virtual_hosts:
+            - name: vhemery
+              domains:
+              - "emery"
+              routes:
+              - match:
+                  prefix: "/"
+                  grpc: {}
+                route:
+                  cluster: emery
+          http_filters:
+          - name: envoy.router # enable the Router filter
+
   clusters:
   - name: localclus
     connect_timeout: 1s
@@ -58,8 +78,8 @@ static_resources:
     http2_protocol_options: {} # enable H2 protocol
     hosts:
     - socket_address:
-        address: 192.168.87.3
+        address: 192.168.87.5
         port_value: 9911
     - socket_address:
-        address: 192.168.87.3
+        address: 192.168.87.5
         port_value: 9911

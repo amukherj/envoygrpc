@@ -1,6 +1,6 @@
 ALL=messages/messages.pb.go bin/server bin/client
 
-all: prereq $(ALL)
+all: prereq gencert $(ALL)
 
 .PHONY: prereq
 prereq:
@@ -16,6 +16,20 @@ prereq:
 	  sudo mv /tmp/protoc3/include/* /usr/include; \
 	fi
 	go get google.golang.org/grpc
+
+.PHONY: gencert
+gencert:
+	mkdir -p config/certs
+	if [ ! -f config/certs/envoy.key -o ! -f config/certs/envoy.crt ]; then \
+	  openssl req -new -sha256 -key config/certs/envoy.key \
+	    -subj "/C=US/ST=CA/O=Acme, Inc./CN=localhost" -reqexts SAN \
+	    -config <(cat /etc/ssl/openssl.cnf \
+	    <(printf "\n[SAN]\nsubjectAltName=DNS:localhost,DNS:$$(hostname)")) \
+	    -out config/certs/envoy.csr; \
+	  openssl x509 -signkey config/certs/envoy.key \
+	    -in config/certs/envoy.csr -req \
+	    -days 365 -out config/certs/envoy.crt
+	fi
 
 messages/messages.pb.go: protos/messages/messages.proto
 	mkdir -p messages

@@ -2,11 +2,13 @@ package main
 
 import (
 	"context"
+	"crypto/tls"
 	"log"
 	"os"
 	"time"
 
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/metadata"
 
 	"github.com/amukherj/envoygrpc/messages"
@@ -32,11 +34,19 @@ func main() {
 		headerVal = os.Args[4]
 	}
 
-	dialOptions := []grpc.DialOption{grpc.WithInsecure(), grpc.WithBlock()}
+	config := &tls.Config{
+		InsecureSkipVerify: true,
+	}
+	dialOptions := []grpc.DialOption{
+		// grpc.WithInsecure(),
+		grpc.WithTransportCredentials(credentials.NewTLS(config)),
+		// grpc.WithBlock(),
+	}
 	if header == "authority" {
 		dialOptions = append(dialOptions, grpc.WithAuthority(headerVal))
 		header = ""
 	}
+
 	conn, err := grpc.Dial(address, dialOptions...)
 	if err != nil {
 		log.Fatalf("Failed to connect to grpc server: %v", err)
