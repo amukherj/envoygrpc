@@ -1,4 +1,5 @@
 ALL=messages/messages.pb.go bin/server bin/client
+SSL_CNF_PATH=/tmp/gencert-ssl.cnf
 
 all: prereq gencert $(ALL)
 
@@ -21,14 +22,15 @@ prereq:
 gencert:
 	mkdir -p config/certs
 	if [ ! -f config/certs/envoy.key -o ! -f config/certs/envoy.crt ]; then \
+	  openssl genrsa -out config/certs/envoy.key 2048; \
+	  printf "\n[SAN]\nsubjectAltName=DNS:localhost,DNS:$$(hostname)" | cat /etc/ssl/openssl.cnf - >$(SSL_CNF_PATH); \
 	  openssl req -new -sha256 -key config/certs/envoy.key \
 	    -subj "/C=US/ST=CA/O=Acme, Inc./CN=localhost" -reqexts SAN \
-	    -config <(cat /etc/ssl/openssl.cnf \
-	    <(printf "\n[SAN]\nsubjectAltName=DNS:localhost,DNS:$$(hostname)")) \
+	    -config $(SSL_CNF_PATH) \
 	    -out config/certs/envoy.csr; \
 	  openssl x509 -signkey config/certs/envoy.key \
 	    -in config/certs/envoy.csr -req \
-	    -days 365 -out config/certs/envoy.crt
+	    -days 365 -out config/certs/envoy.crt; \
 	fi
 
 messages/messages.pb.go: protos/messages/messages.proto
