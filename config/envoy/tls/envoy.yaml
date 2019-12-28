@@ -99,15 +99,15 @@ static_resources:
   clusters:
   - name: localclus
     connect_timeout: 1s
-    type: strict_dns
+    type: static
     lb_policy: round_robin
     http2_protocol_options: {} # enable H2 protocol
     hosts:
     - socket_address:
-        address: localhost
+        address: 127.0.0.1
         port_value: 50501
     - socket_address:
-        address: localhost
+        address: 127.0.0.1
         port_value: 50503
   - name: emery
     connect_timeout: 1s
@@ -118,3 +118,5 @@ static_resources:
     - socket_address:
         address: 192.168.87.5
         port_value: 9943
+    tls_context:
+      sni: localhost

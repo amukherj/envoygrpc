@@ -38,12 +38,14 @@ func main() {
 		InsecureSkipVerify: true,
 	}
 	dialOptions := []grpc.DialOption{
-		// grpc.WithInsecure(),
 		grpc.WithTransportCredentials(credentials.NewTLS(config)),
-		// grpc.WithBlock(),
 	}
 	if header == "authority" {
-		dialOptions = append(dialOptions, grpc.WithAuthority(headerVal))
+		dialOptions = []grpc.DialOption{
+			grpc.WithInsecure(),
+			grpc.WithAuthority(headerVal),
+			grpc.WithBlock(),
+		}
 		header = ""
 	}
 
