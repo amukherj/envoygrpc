@@ -1,9 +1,9 @@
 # Using Envoy as a reverse proxy for GRPC services
 
-This repo demonstrates how to configure Envoy for routing to gRPC services.
-The focus is to show basic constructs for enabling routing to gRPC services,
-making it work with TLS / mTLS (todo), and making certificates available via
-the Secrets Discovery Service.
+This repo demonstrates how to configure [Envoy](https://www.envoyproxy.io/) for
+routing to gRPC services. The focus is to show basic constructs for enabling
+routing to gRPC services, making it work with TLS / mTLS (todo), and making
+certificates available via the Secrets Discovery Service.
 
 The norm for most such repos is to use at the least Docker. I have deliberately
 avoided any form of containers or other deployment shebang to keep the focus
@@ -16,6 +16,9 @@ on just Envoy and make it utterly easy to understand what's going on.
 4. The Secrets Discovery Service implementation is under `cmd/sds` and is
 deliberately kept simple.
 
+Self-signed certificates are automatically generated as part of the build
+process. Look at the Makefile to understand what's going on. This also means
+that you should have OpenSSL installed on your dev box.
 
 ## Building
 To build the binaries just do the following.
