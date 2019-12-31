@@ -1,6 +1,9 @@
 # Using Envoy as a reverse proxy for GRPC services
 
 This repo demonstrates how to configure Envoy for routing to gRPC services.
+The norm for most such repos is to use at the least Docker. I have deliberately
+avoided any form of containers or other deployment shebang to keep the focus
+on just Envoy and make it utterly easy to understand what's going on.
 
 ## Building
 To build the binaries just do the following.
