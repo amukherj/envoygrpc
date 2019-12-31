@@ -39,6 +39,24 @@ Run the client:
 
     ./bin/client 0.0.0.0:9943 "Your message here"
 
+#### TLS via Secrets Discovery Service (SDS)
+You can serve TLS certs via the Secrets Discovery Service (SDS) instead of
+statically. There is a simplistic SDS implementation in cmd/sds/main.go. To
+test this, run the following commands in addition to starting the two
+instances of ./bin/server on 50501 and 50503.
+
+	./sds
+    ./bin/envoy -c config/envoy/tls/envoy-sds.yaml
+
+Run the client:
+
+    ./bin/client 0.0.0.0:9943 "Your message here"
+
+QQ: Why don't we use the envoyproxy/go-control-plane implementation of SDS?
+Mainly because it doesn't support SDS connections via Unix domain sockets
+and require that you set up mTLS between Envoy and the control plane process
+running the SDS implementation. Feel free to fork this repo and try it.
+
 ### Egress
 Start two instances of the gRPC server on a remote server. Note the IP
 address of the remote server.
@@ -79,3 +97,6 @@ Run the client to connect to the egress port on the local Envoy:
 
 In the above, `emery` is the identifier for your remote host(s). It can be any
 name as long as you also update it in the config.
+
+#### TLS via Secrets Discovery Service (SDS)
+Left as an exercise. Easy to extend based on the earlier example.

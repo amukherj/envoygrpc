@@ -1,4 +1,4 @@
-ALL=messages/messages.pb.go bin/server bin/client
+ALL=messages/messages.pb.go bin/server bin/client bin/sds
 SSL_CNF_PATH=/tmp/gencert-ssl.cnf
 
 all: prereq gencert $(ALL)
@@ -42,6 +42,9 @@ bin/server: cmd/server/main.go messages/messages.pb.go
 
 bin/client: cmd/client/main.go messages/messages.pb.go
 	go build -o bin/client ./$$(dirname $<)
+
+bin/sds: cmd/sds/main.go
+	go build -o bin/sds ./$$(dirname $<)
 
 clean:
 	rm -rf $(ALL)
