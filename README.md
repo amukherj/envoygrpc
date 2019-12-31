@@ -1,18 +1,31 @@
 # Using Envoy as a reverse proxy for GRPC services
 
 This repo demonstrates how to configure Envoy for routing to gRPC services.
+The focus is to show basic constructs for enabling routing to gRPC services,
+making it work with TLS / mTLS (todo), and making certificates available via
+the Secrets Discovery Service.
+
 The norm for most such repos is to use at the least Docker. I have deliberately
 avoided any form of containers or other deployment shebang to keep the focus
 on just Envoy and make it utterly easy to understand what's going on.
+
+## Code
+1. The grpc service and message definitions are under `messages`.
+2. The grpc service implementation is under `cmd/server`.
+3. The grpc client implementation is under `cmd/client`.
+4. The Secrets Discovery Service implementation is under `cmd/sds` and is
+deliberately kept simple.
+
 
 ## Building
 To build the binaries just do the following.
 
     make
 
-You will also need to get hold of the envoy binary from somewhere. Consider
-pulling the Envoy docker image, running, and `docker cp`-ing the envoy
-binary from inside it. Copy this binary to the `bin/` subdirectory of the repo.
+It is expected that you will copy a pre-built Envoy binary from somewhere into
+`./bin`.  Consider pulling the Envoy docker image, running, and `docker cp`-ing
+the envoy binary from inside it. Copy this binary to the `bin/` subdirectory of
+the repo.
 
 ## Running
 
