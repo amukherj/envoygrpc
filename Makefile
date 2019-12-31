@@ -5,8 +5,14 @@ all: prereq gencert $(ALL)
 
 .PHONY: prereq
 prereq:
+	dep ensure
 	if [ -z "${GOPATH}" ]; then \
 	  echo "GOPATH is not set"; \
+	  exit 1; \
+	fi
+	which openssl >/dev/null;
+	if [ $$? -ne 0 ]; then \
+	  >&2 echo "OpenSSL is not installed"; \
 	  exit 1; \
 	fi
 	which protoc >/dev/null
