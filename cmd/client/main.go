@@ -12,6 +12,7 @@ import (
 	"google.golang.org/grpc/metadata"
 
 	"github.com/amukherj/envoygrpc/messages"
+	"github.com/amukherj/envoygrpc/names"
 )
 
 var address string = "localhost:50501"
@@ -40,6 +41,8 @@ func main() {
 	dialOptions := []grpc.DialOption{
 		grpc.WithTransportCredentials(credentials.NewTLS(config)),
 	}
+	// grpc.WithInsecure()
+
 	if header == "authority" {
 		dialOptions = []grpc.DialOption{
 			grpc.WithInsecure(),
@@ -51,10 +54,11 @@ func main() {
 
 	conn, err := grpc.Dial(address, dialOptions...)
 	if err != nil {
-		log.Fatalf("Failed to connect to grpc server: %v", err)
+		log.Fatalf("[client] Failed to connect to grpc server: %v", err)
 	}
 	defer conn.Close()
 
+	// Call the EchoService
 	client := messages.NewEchoServiceClient(conn)
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
@@ -74,10 +78,28 @@ func main() {
 
 	resp, err := client.Hello(ctx, &payload, grpc.Header(&headers))
 	if err != nil {
-		log.Fatalf("RPC error: %v", err)
+		log.Fatalf("[client] RPC error: %v", err)
 	}
-	log.Printf(`Response message:
+	log.Printf(`[client] Response message:
 	From: %s
 	Sent-at: %d
 	Msg: %s`, resp.GetServerName(), resp.GetUtcTime(), resp.GetMsg())
+
+	// Call the GreatNamesService
+	client1 := names.NewGreatNamesServiceClient(conn)
+	now = time.Now().Unix()
+	request := &names.NameRequest{
+		ServerName: &serverName,
+		UtcTime:    &now,
+	}
+
+	resp1, err := client1.Get(ctx, request, grpc.Header(&headers))
+	if err != nil {
+		log.Fatalf("[client] RPC error: %v", err)
+	}
+	log.Printf(`[client] Response message:
+	From: %s
+	Sent-at: %d
+	Response: %s %s`, resp1.GetServerName(), resp1.GetUtcTime(),
+		resp1.GetQuality(), resp1.GetPerson())
 }

@@ -1,4 +1,4 @@
-ALL=messages/messages.pb.go bin/server bin/client bin/sds
+ALL=messages/messages.pb.go bin/server bin/client bin/sds names/names.pb.go bin/names
 SSL_CNF_PATH=/tmp/gencert-ssl.cnf
 
 all: prereq gencert $(ALL)
@@ -43,8 +43,15 @@ messages/messages.pb.go: protos/messages/messages.proto
 	mkdir -p messages
 	protoc -I $$(dirname $<) $$(basename $<) --go_out=plugins=grpc:$$(dirname $@)
 
+names/names.pb.go: protos/names/names.proto
+	mkdir -p names
+	protoc -I $$(dirname $<) $$(basename $<) --go_out=plugins=grpc:$$(dirname $@)
+
 bin/server: cmd/server/main.go messages/messages.pb.go
 	go build -o bin/server ./$$(dirname $<)
+
+bin/names: cmd/names/main.go names/names.pb.go
+	go build -o bin/names ./$$(dirname $<)
 
 bin/client: cmd/client/main.go messages/messages.pb.go
 	go build -o bin/client ./$$(dirname $<)

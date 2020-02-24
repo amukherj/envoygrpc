@@ -52,10 +52,15 @@ static_resources:
               - "*"
               routes:
               - match:
-                  prefix: "/"
+                  prefix: "/messages.EchoService"
                   grpc: {}
                 route:
-                  cluster: localclus
+                  cluster: greeterclus
+              - match:
+                  prefix: "/names.GreatNamesService"
+                  grpc: {}
+                route:
+                  cluster: textclus
           http_filters:
           - name: envoy.router # enable the Router filter
             config: {}
@@ -97,7 +102,7 @@ static_resources:
           - name: envoy.router # enable the Router filter
             config: {}
   clusters:
-  - name: localclus
+  - name: greeterclus
     connect_timeout: 1s
     type: static
     lb_policy: round_robin
@@ -109,6 +114,18 @@ static_resources:
     - socket_address:
         address: 127.0.0.1
         port_value: 50503
+  - name: textclus
+    connect_timeout: 1s
+    type: static
+    lb_policy: round_robin
+    http2_protocol_options: {} # enable H2 protocol
+    hosts:
+    - socket_address:
+        address: 127.0.0.1
+        port_value: 50505
+    - socket_address:
+        address: 127.0.0.1
+        port_value: 50507
   - name: emery
     connect_timeout: 1s
     type: static

@@ -10,8 +10,14 @@ avoided any form of containers or other deployment shebang to keep the focus
 on just Envoy and make it utterly easy to understand what's going on.
 
 ## Code
-1. The grpc service and message definitions are under `messages`.
-2. The grpc service implementation is under `cmd/server`.
+There are two gRPC services.
+
+1. For the first gRPC service, `echo`:
+   1. The grpc service and message definitions are under `messages`.
+   2. The grpc service implementation is under `cmd/server`.
+1. For the second gRPC service, `names`:
+   1. The grpc service and message definitions are under `names`.
+   2. The grpc service implementation is under `cmd/names`.
 3. The grpc client implementation is under `cmd/client`.
 4. The Secrets Discovery Service implementation is under `cmd/sds` and is
 deliberately kept simple.
@@ -33,10 +39,13 @@ the repo.
 ## Running
 
 ### Ingress
-Start two instances of the gRPC server locally:
+Start two instances of each gRPC server locally:
 
     ./bin/server :50501
     ./bin/server :50503
+
+    ./bin/names :50505
+    ./bin/names :50507
 
 Start Envoy:
 
@@ -49,7 +58,7 @@ Run the client:
 In the response printed on the console, check if the From field is correctly set
 to the local host's hostname.
 
-#### TLS
+#### Ingress with TLS
 If you want to test TLS support, start Envoy thus:
 
     ./bin/envoy -c config/envoy/tls/envoy.yaml

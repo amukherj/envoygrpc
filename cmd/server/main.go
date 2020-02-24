@@ -17,7 +17,7 @@ type MsgService struct{}
 func (m MsgService) Hello(ctx context.Context,
 	in *messages.EchoMessage) (*messages.EchoMessage, error) {
 
-	log.Printf(`Message received: \n
+	log.Printf(`[echo] Message received: \n
 	From: %s
 	Sent-at: %d
 	Content: %s`,
@@ -42,15 +42,15 @@ func main() {
 
 	lis, err := net.Listen("tcp", port)
 	if err != nil {
-		log.Fatalf("Failed to start listening on %s: %v", port, err)
+		log.Fatalf("[echo] Failed to start listening on %s: %v", port, err)
 	}
 
 	svrName, err := os.Hostname()
 	svr := grpc.NewServer()
 	var svc MsgService
 	messages.RegisterEchoServiceServer(svr, svc)
-	log.Printf("Starting GRPC server on %s port %s ...\n", svrName, port)
+	log.Printf("[echo] Starting GRPC server on %s port %s ...\n", svrName, port)
 	if err := svr.Serve(lis); err != nil {
-		log.Fatalf("Failed to start GRPC service: %v", err)
+		log.Fatalf("[echo] Failed to start GRPC service: %v", err)
 	}
 }
