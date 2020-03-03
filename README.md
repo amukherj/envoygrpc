@@ -67,6 +67,19 @@ Run the client:
 
     ./bin/client 0.0.0.0:9943 "Your message here"
 
+#### Ingress with TLS and header-based routing
+If you want to test TLS support, start Envoy thus:
+
+    ./bin/envoy -c config/envoy/tls/envoy-hdr-rtg.yaml
+
+Run the client:
+
+    ./bin/hdrclient 0.0.0.0:9943 "Your message here" x-ikat-service-id greeter
+
+Or:
+
+    ./bin/hdrclient 0.0.0.0:9943 "Your message here" x-ikat-service-id text
+
 #### TLS via Secrets Discovery Service (SDS)
 You can serve TLS certs via the Secrets Discovery Service (SDS) instead of
 statically. There is a simplistic SDS implementation in cmd/sds/main.go. To
