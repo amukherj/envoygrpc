@@ -1,4 +1,4 @@
-ALL=messages/messages.pb.go bin/server bin/client bin/sds names/names.pb.go bin/names
+ALL=messages/messages.pb.go bin/server bin/client bin/hdrclient bin/sds names/names.pb.go bin/names
 SSL_CNF_PATH=/tmp/gencert-ssl.cnf
 
 all: prereq gencert $(ALL)
@@ -55,6 +55,9 @@ bin/names: cmd/names/main.go names/names.pb.go
 
 bin/client: cmd/client/main.go messages/messages.pb.go
 	go build -o bin/client ./$$(dirname $<)
+
+bin/hdrclient: cmd/hdrclient/main.go messages/messages.pb.go
+	go build -o bin/hdrclient ./$$(dirname $<)
 
 bin/sds: cmd/sds/main.go
 	go build -o bin/sds ./$$(dirname $<)
