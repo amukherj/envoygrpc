@@ -9,4 +9,5 @@ message EchoMessage {
 
 service EchoService {
   rpc Hello (EchoMessage) returns (EchoMessage) {}
+  rpc WhatsUp (stream EchoMessage) returns (stream EchoMessage) {}
 }

@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"io"
 	"log"
 	"net"
 	"os"
@@ -31,6 +32,33 @@ func (m MsgService) Hello(ctx context.Context,
 	in.Msg = &response
 
 	return in, nil
+}
+
+func (m MsgService) WhatsUp(stream messages.EchoService_WhatsUpServer) error {
+	for {
+		in, err := stream.Recv()
+		if err == io.EOF {
+			return nil
+		}
+		if err != nil {
+			return err
+		}
+		log.Printf(`[echo] Request received: \n
+From: %s
+Sent-at: %d
+Content: %s`,
+			in.GetServerName(), in.GetUtcTime(), in.GetMsg())
+
+		hostname, _ := os.Hostname()
+		response := "Response: " + in.GetMsg()
+		now := time.Now().Unix()
+		in.ServerName = &hostname
+		in.UtcTime = &now
+		in.Msg = &response
+		if err = stream.Send(in); err != nil {
+			return err
+		}
+	}
 }
 
 func main() {

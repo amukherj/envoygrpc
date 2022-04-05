@@ -5,7 +5,7 @@ all: prereq gencert $(ALL)
 
 .PHONY: prereq
 prereq:
-	dep ensure
+	# dep ensure
 	if [ -z "${GOPATH}" ]; then \
 	  echo "GOPATH is not set"; \
 	  exit 1; \
@@ -48,19 +48,19 @@ names/names.pb.go: protos/names/names.proto
 	protoc -I $$(dirname $<) $$(basename $<) --go_out=plugins=grpc:$$(dirname $@)
 
 bin/server: cmd/server/main.go messages/messages.pb.go
-	go build -o bin/server ./$$(dirname $<)
+	go build -o $@ ./$$(dirname $<)
 
 bin/names: cmd/names/main.go names/names.pb.go
-	go build -o bin/names ./$$(dirname $<)
+	go build -o $@ ./$$(dirname $<)
 
 bin/client: cmd/client/main.go messages/messages.pb.go
-	go build -o bin/client ./$$(dirname $<)
+	go build -o $@ ./$$(dirname $<)
 
 bin/hdrclient: cmd/hdrclient/main.go messages/messages.pb.go
-	go build -o bin/hdrclient ./$$(dirname $<)
+	go build -o $@ ./$$(dirname $<)
 
 bin/sds: cmd/sds/main.go
-	go build -o bin/sds ./$$(dirname $<)
+	go build -o $@ ./$$(dirname $<)
 
 clean:
 	rm -rf $(ALL)
