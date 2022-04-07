@@ -116,12 +116,12 @@ func main() {
 		Msg:        &msg,
 	}
 
-	headers := metadata.MD{}
 	if len(header) > 0 {
-		headers[header] = []string{headerVal}
+    ctx = metadata.NewOutgoingContext(ctx,
+      metadata.New(map[string]string{header: headerVal}))
 	}
 
-	resp, err := client.Hello(ctx, &payload, grpc.Header(&headers))
+	resp, err := client.Hello(ctx, &payload)
 	if err != nil {
 		log.Fatalf("[client] RPC error: %v", err)
 	}
@@ -138,7 +138,7 @@ func main() {
 		UtcTime:    &now,
 	}
 
-	resp1, err := client1.Get(ctx, request, grpc.Header(&headers))
+	resp1, err := client1.Get(ctx, request)
 	if err != nil {
 		log.Fatalf("[client] RPC error: %v", err)
 	}
@@ -149,7 +149,7 @@ func main() {
 		resp1.GetQuality(), resp1.GetPerson()) */
 
 	// Call the streaming WhatsUp service on EchoService
-	stream, err := client.WhatsUp(context.Background())
+	stream, err := client.WhatsUp(ctx)
 
 	msg_base := ""
 	if len(os.Args) > 2 {
