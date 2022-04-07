@@ -64,7 +64,7 @@ func main() {
   flagOffset := len(os.Args) - flag.NArg() -1
 
 	if len(os.Args) <= flagOffset + 1 {
-		log.Fatalf("usage: %s [-key <keyfile> -cert <certfile> [-cacert <ca_file>]] <server-IP:port> [[msg] header value]",
+		log.Fatalf("usage: %s [-key <keyfile> -cert <certfile> [-cacert <ca_file>]] <server-IP:port> [[msg] header1 value1 ...]",
 			os.Args[flag.NArg() + 0])
 	}
 	address = os.Args[flagOffset + 1]
@@ -73,11 +73,10 @@ func main() {
 		msg = os.Args[flagOffset + 2]
 	}
 
-	var header, headerVal string
-	if len(os.Args) > flagOffset + 4 {
-		header = os.Args[flagOffset + 3]
-		headerVal = os.Args[flagOffset + 4]
-	}
+  headers := map[string]string{}
+  for i := flagOffset + 3; i+1 < len(os.Args); i = i+2 {
+    headers[os.Args[i]] = os.Args[i+1]
+  }
 
 	tlsCred, err := GetTLSCreds(crtFile, keyFile, caFile)
   if err != nil {
@@ -88,13 +87,14 @@ func main() {
 		grpc.WithTransportCredentials(tlsCred),
 	}
 
-	if header == "authority" {
+	if val, ok := headers["authority"]; ok {
 		dialOptions = []grpc.DialOption{
 			grpc.WithInsecure(),
-			grpc.WithAuthority(headerVal),
+			grpc.WithAuthority(val),
+      grpc.WithTransportCredentials(tlsCred),
 			grpc.WithBlock(),
 		}
-		header = ""
+		delete(headers, "authority")
 	}
 
 	conn, err := grpc.Dial(address, dialOptions...)
@@ -116,9 +116,9 @@ func main() {
 		Msg:        &msg,
 	}
 
-	if len(header) > 0 {
+	if len(headers) > 0 {
     ctx = metadata.NewOutgoingContext(ctx,
-      metadata.New(map[string]string{header: headerVal}))
+      metadata.New(headers))
 	}
 
 	resp, err := client.Hello(ctx, &payload)
@@ -169,7 +169,7 @@ func main() {
 			log.Printf(`[client] Response message:
 	From: %s
 	Sent-at: %d
-	Response: %s %s`, resp.GetServerName(), resp.GetUtcTime(), resp.GetMsg())
+	Response: %s`, resp.GetServerName(), resp.GetUtcTime(), resp.GetMsg())
 		}
     time.Sleep(100 * time.Millisecond)
 	}
